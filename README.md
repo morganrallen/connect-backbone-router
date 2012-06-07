@@ -36,5 +36,7 @@ var server = app.listen(8080);
 ```
 
 Now you should be able to get the whole collection at http://localhost:8080/data/hitchhikers
+
 The single model at http://localhost:8080/data/hitchhikers/0
+
 Or an attribute at http://localhost:8080/data/hitchhikers/0/name

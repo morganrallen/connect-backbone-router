@@ -1,4 +1,4 @@
-var Backbone = require("Backbone"),
+var Backbone = require("backbone"),
 	connect = require("connect"),
 	color = require("colors"),
 	connect_backbone_router = require("./../"),

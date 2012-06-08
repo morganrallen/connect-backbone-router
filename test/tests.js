@@ -3,7 +3,10 @@ var Backbone = require("Backbone"),
 	color = require("colors"),
 	connect_backbone_router = require("./../"),
 	
-	request = require("request");
+	request = require("request"),
+	
+	tap = require("tap"),
+	test = tap.test;
 
 var port = 8080;
 
@@ -18,7 +21,7 @@ var collections = {
 	])
 };
 
-app.use(connect.logger());
+//app.use(connect.logger());
 app.use(connect.bodyParser());
 
 app.use(connect_backbone_router({
@@ -33,73 +36,74 @@ app.use(function(req,res,next) {
 
 var server = app.listen(port);
 
-console.log("\nListening on port ".green + String(port).red);
+tap.output.on("end", function() {
+	//console.log("Done");
+	server.close();
+});
+
+//console.log("\nListening on port ".green + String(port).red);
 
 var url = "http://localhost:" + port + "/data/hitchhikers";
 
-asyncTest("Fetching Collection Data", 3, function() {
-	console.log("Fetching Collection Data");
-	stop();
+test("Fetching Collection Data", function(t) {
+	//console.log("Fetching Collection Data");
+
+	t.plan(3);
+
 	request.get(url + "", function(err, resp, body) {
-		var data = JSON.parse(body);
-		deepEqual(data, collections.hitchhikers.toJSON(), "Returned JSON same as collection");
-		start();
+		t.equal(body, JSON.stringify(collections.hitchhikers.toJSON()), "Returned JSON same as collection");
 	});
 
 	request.get(url + "/0", function(err, resp, body) {
-		var data = JSON.parse(body);
-		deepEqual(data, collections.hitchhikers.get(0).toJSON(), "Returned JSON same as model");
-		start();
+		t.equal(body, JSON.stringify(collections.hitchhikers.get(0).toJSON()), "Returned JSON same as model");
 	});
 
 	request.get(url + "/0/name", function(err, resp, body) {
 		var data = JSON.parse(body);
-		equal(data, collections.hitchhikers.get(0).get("name"), "Returned String(name) same as models");
-		start();
+		t.equal(data, collections.hitchhikers.get(0).get("name"), "Returned String(name) same as models");
 	});
 });
 
-asyncTest("Updating Existing Model", 1, function() {
-	console.log("Updating Existing Model");
-	request({
-		method: "put",
-		url: url + "/1",
-		json: {
-			drink: "Gangalactic Gargleblaster"
-		}
-	}, function(err, resp, body) {
-		deepEqual(body, collections.hitchhikers.get(1).toJSON(), "Returned model matches updated model");
-		start();
-	});
-});
-
-asyncTest("Creating New Model", 1, function() {
-	console.log("Creating New Model");
+test("Creating New Model", function(t1) {
+	//console.log("Creating New Model");
 	var data = {
 		id: 1,
 		name: "Ford"
 	};
+
+	t1.plan(1);
 
 	request({
 		method: "post",
 		url: url + "",
 		json: data
 	}, function(err, resp, body) {
-		deepEqual(body, collections.hitchhikers.toJSON(), "Returned data from POST same as in collection");
-		start();
+		test("Updating Existing Model", function(t2) {
+			t2.plan(1);
+
+			//console.log("Updating Existing Model");
+			request({
+				method: "put",
+				url: url + "/1",
+				json: {
+					drink: "Gangalactic Gargleblaster"
+				}
+			}, function(err, resp, body) {
+				t2.equal(JSON.stringify(body), JSON.stringify(collections.hitchhikers.get(1).toJSON()), "Returned model matches updated model");
+			});
+		});
+
+		t1.equal(JSON.stringify(body), JSON.stringify(collections.hitchhikers.toJSON()), "Returned data from POST same as in collection");
 	});
 });
 
-asyncTest("Delete Model", 1, function() {
+test("Delete Model", function(t) {
+	t.plan(1);
+
 	request({
 		method: "delete",
 		url: url + "/0"
 	}, function(err, rest, body) {
-		deepEqual(JSON.parse(body), collections.hitchhikers.toJSON(), "Returned data matches collection");
-		start();
+		t.equal(body, JSON.stringify(collections.hitchhikers.toJSON()), "Returned data matches collection");
 	});
-});
-
-QUnit.done(function() {
-	server.close();
 });

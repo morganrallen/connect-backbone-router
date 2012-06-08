@@ -1,4 +1,12 @@
-Usage
+connect-backbone-router
+=======================
+Sets routes for Backbone collections in Connect
+
+[![Build Status](https://secure.travis-ci.org/morganrallen/connect-backbone-router.png)](http://travis-ci.org/morganrallen/connect-backbone-router)
+
+
+Example
+=======
 
 ```javascript
 var Backbone = require("Backbone"),

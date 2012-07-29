@@ -36,7 +36,7 @@ var otherCollections = [
 
 app.use(connect_backbone_router({
 	debug: true,
-	path: "/c",
+	path: "/data/c",
 	collections: otherCollections
 }));
 
@@ -63,7 +63,7 @@ tap.output.on("end", function() {
 //console.log("\nListening on port ".green + String(port).red);
 
 var url = "http://localhost:" + port + "/data/hitchhikers";
-var courierUrl = "http://localhost:" + port + "/c/couriers";
+var courierUrl = "http://localhost:" + port + "/data/c/couriers";
 
 test("Fetching Collection Data", function(t) {
 	//console.log("Fetching Collection Data");

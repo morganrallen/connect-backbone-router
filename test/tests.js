@@ -16,6 +16,15 @@ var collections = {
 		new Backbone.Model({
 			id: 0,
 			name: "Zaphod"
+		}), new Backbone.Model({
+			id: 1,
+			name: "Ford",
+		}), new Backbone.Model({
+			id: 2,
+			name: "Arthur",
+		}), new Backbone.Model({
+			id: 2,
+			name: "Trillian",
 		})
 	])
 };
@@ -68,10 +77,14 @@ var courierUrl = "http://localhost:" + port + "/data/c/couriers";
 test("Fetching Collection Data", function(t) {
 	//console.log("Fetching Collection Data");
 
-	t.plan(6);
+	t.plan(8);
 
 	request.get(url + "", function(err, resp, body) {
 		t.equal(body, JSON.stringify(collections.hitchhikers.toJSON()), "Returned JSON same as collection");
+	});
+
+	request.get(url + "/@2", function(err, resp, body) {
+		t.equal(body, JSON.stringify(collections.hitchhikers.at(2).toJSON()), "Returned JSON same as collection with @");
 	});
 
 	request.get(url + "/0", function(err, resp, body) {
@@ -81,6 +94,11 @@ test("Fetching Collection Data", function(t) {
 	request.get(url + "/0/name", function(err, resp, body) {
 		var data = JSON.parse(body);
 		t.equal(data, collections.hitchhikers.get(0).get("name"), "Returned String(name) same as models");
+	});
+
+	request.get(url + "/@2/name", function(err, resp, body) {
+		var data = JSON.parse(body);
+		t.equal(body, JSON.stringify(collections.hitchhikers.at(2).get("name")), "Returned JSON same as collection with @");
 	});
 
 	request.get(courierUrl + "", function(err, resp, body) {

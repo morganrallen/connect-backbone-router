@@ -20,6 +20,26 @@ var collections = {
 	])
 };
 
+var SpaceCouriers = Backbone.Collection.extend({
+	name: "couriers"
+});
+
+var otherCollections = [
+	new SpaceCouriers([{
+		id: 0,
+		name: "Fry"
+	}, {
+		id: 1,
+		name: "Zoidburg"
+	}])
+];
+
+app.use(connect_backbone_router({
+	debug: true,
+	path: "/c",
+	collections: otherCollections
+}));
+
 //app.use(connect.logger());
 app.use(connect.bodyParser());
 
@@ -43,11 +63,12 @@ tap.output.on("end", function() {
 //console.log("\nListening on port ".green + String(port).red);
 
 var url = "http://localhost:" + port + "/data/hitchhikers";
+var courierUrl = "http://localhost:" + port + "/c/couriers";
 
 test("Fetching Collection Data", function(t) {
 	//console.log("Fetching Collection Data");
 
-	t.plan(3);
+	t.plan(6);
 
 	request.get(url + "", function(err, resp, body) {
 		t.equal(body, JSON.stringify(collections.hitchhikers.toJSON()), "Returned JSON same as collection");
@@ -60,6 +81,20 @@ test("Fetching Collection Data", function(t) {
 	request.get(url + "/0/name", function(err, resp, body) {
 		var data = JSON.parse(body);
 		t.equal(data, collections.hitchhikers.get(0).get("name"), "Returned String(name) same as models");
+	});
+
+	request.get(courierUrl + "", function(err, resp, body) {
+		t.equal(body, JSON.stringify(otherCollections[0].toJSON()), "Returned JSON same as collection from Array");
+	});
+
+	request.get(courierUrl + "/0", function(err, resp, body) {
+		t.equal(body, JSON.stringify(otherCollections[0].get(0).toJSON()), "Returned JSON same as model from Array");
+	});
+
+	request.get(courierUrl + "/0/name", function(err, resp, body) {
+		console.log(body);
+		var data = JSON.parse(body);
+		t.equal(data, otherCollections[0].get(0).get("name"), "Returned String(name) same as models from Array");
 	});
 });
 
